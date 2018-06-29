@@ -30,7 +30,7 @@ use transfer::*;
 
 fn main() {
 
-    let addr = env::args().nth(1).unwrap_or("0.0.0.0:6070".to_string());
+    let addr = env::args().nth(1).unwrap_or("0.0.0.0:8433".to_string());
     let addr = addr.parse::<SocketAddr>().unwrap();
     let mut core = Core::new().unwrap();
     let handle = core.handle();
@@ -52,32 +52,36 @@ fn main() {
 
         let db = db.clone();
         let responses = lines.map(move |line| {
+
             let result: Result<FalconMethod, Error> = serde_json::from_str(&line);
+
             match result {
                 Ok(req) => {
                     let mut db = db.methods.borrow_mut();
                     println!("{}, {} {} {}", db.len(), req.method, req.params[0][0].metric, req.params[0][0].value);
                     db.push(req);
 
-                    return SimpleRpcResponse {Code: 0};
+                    // return TransferResponse {id: 0, result: json!({}), error: json!(null)};
+                    return "{\"id\":0,\"result\":{},\"error\":null}";
                 },
                 Err(e) => {
                     println!("{}", e);
 
-                    return SimpleRpcResponse {Code: 1};
+                    //return TransferResponse {id: 0, result: json!({}), error: json!(e.to_string())};
+                    return "{\"id\":0,\"result\":{},\"error\":null}";
                 }
             }
         });
 
         let writes = responses.fold(writer, |writer, response| {
-
-            let mut response = serde_json::to_string(&response).unwrap();
-            response.push('\n');
-            write_all(writer, response.into_bytes()).map(|(w, _)| w)
+            write_all(writer, response.to_string().into_bytes()).map(|(w, _)| w)
         });
 
-        let msg = writes.then(move |_| Ok(()));
+        let msg = writes.then(move |_| {
+            Ok(())
+        });
         handle.spawn(msg);
+
         Ok(())
     });
 

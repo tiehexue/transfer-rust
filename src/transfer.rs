@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use serde_json::Value;
 
 #[derive(Serialize, Deserialize)]
 pub struct Metric {
@@ -19,17 +20,16 @@ pub struct FalconMethod {
 }
 
 
+/*
+Id     uint64           `json:"id"`
+	Result *json.RawMessage `json:"result"`
+	Error  interface{}      `json:"error"`
+*/
 #[derive(Serialize, Deserialize)]
 pub struct TransferResponse {
-    pub Message: String,
-    pub Total:   usize,
-    pub Invalid: u32,
-    pub Latency: u64
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct SimpleRpcResponse {
-    pub Code: u32
+    pub id: u64,
+    pub result: Value,
+    pub error: Value
 }
 
 pub struct Database {
