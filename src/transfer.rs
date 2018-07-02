@@ -1,4 +1,3 @@
-use std::cell::RefCell;
 use serde_json::Value;
 
 #[derive(Serialize, Deserialize)]
@@ -26,6 +25,4 @@ pub struct TransferResponse {
     pub error: Value
 }
 
-pub struct Database {
-    pub methods: RefCell<Vec<FalconMethod>>
-}
+pub type Database = Vec<FalconMethod>;

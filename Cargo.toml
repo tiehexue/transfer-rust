@@ -4,9 +4,6 @@ version = "0.1.0"
 authors = ["Wang Yuan <junxue.w@gmail.com>"]
 
 [dependencies]
-tokio-core = "*"
-tokio-io = "*"
-futures = "*"
 serde = "*"
 serde_json = "*"
 serde_derive = "*"
