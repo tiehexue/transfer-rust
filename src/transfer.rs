@@ -19,12 +19,6 @@ pub struct FalconMethod {
     pub id: u32
 }
 
-
-/*
-Id     uint64           `json:"id"`
-	Result *json.RawMessage `json:"result"`
-	Error  interface{}      `json:"error"`
-*/
 #[derive(Serialize, Deserialize)]
 pub struct TransferResponse {
     pub id: u64,
