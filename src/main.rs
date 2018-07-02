@@ -4,6 +4,8 @@ extern crate futures;
 extern crate tokio_core;
 extern crate tokio_io;
 extern crate serde;
+
+#[macro_use]
 extern crate serde_json;
 
 #[macro_use]
@@ -22,7 +24,7 @@ use tokio_core::reactor::Core;
 use tokio_io::AsyncRead;
 use tokio_io::io::{lines, write_all};
 
-use serde_json::Error;
+use serde_json::{Error, Value};
 
 mod transfer;
 
@@ -61,20 +63,20 @@ fn main() {
                     println!("{}, {} {} {}", db.len(), req.method, req.params[0][0].metric, req.params[0][0].value);
                     db.push(req);
 
-                    // return TransferResponse {id: 0, result: json!({}), error: json!(null)};
-                    return "{\"id\":0,\"result\":{},\"error\":null}";
+                    return TransferResponse {id: 0, result: json!({}), error: Value::Null};
                 },
                 Err(e) => {
                     println!("{}", e);
 
-                    //return TransferResponse {id: 0, result: json!({}), error: json!(e.to_string())};
-                    return "{\"id\":0,\"result\":{},\"error\":null}";
+                    return TransferResponse {id: 0, result: json!({}), error: json!(e.to_string())};
                 }
             }
         });
 
         let writes = responses.fold(writer, |writer, response| {
-            write_all(writer, response.to_string().into_bytes()).map(|(w, _)| w)
+            let mut jsonStr = serde_json::to_string(&response).unwrap();
+            jsonStr.push('\n');
+            write_all(writer, jsonStr.into_bytes()).map(|(w, _)| w)
         });
 
         let msg = writes.then(move |_| {
